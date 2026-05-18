@@ -38,7 +38,7 @@ async function run() {
     });
 
     app.get('/features' , async (req , res) => {
-        const result = await facilitiesCollection.find().limit(4).toArray();
+        const result = await facilitiesCollection.find().limit(6).toArray();
         res.send(result);
     })
 
