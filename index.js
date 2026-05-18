@@ -50,7 +50,11 @@ async function run() {
       res.send(result);
     })
 
-  
+    app.get('/my-bookings/:userID' , async (req , res) => {
+      const {userID} = req.params;
+      const result = await bookingCollection.find({userID : userID}).toArray();
+      res.json(result);
+    })
 
     app.post('/my-bookings' , async (req , res) => {
       const bookingData = req.body;
