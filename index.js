@@ -31,6 +31,7 @@ async function run() {
 
     const db = client.db('SportNestDB');
     const facilitiesCollection = db.collection('AllFacilitiesCollection');
+    const bookingCollection = db.collection('BookingCollection');
 
     app.get('/all-facilities', async (req, res) => {
         const result = await facilitiesCollection.find().toArray();
@@ -47,6 +48,14 @@ async function run() {
       const query = {_id : new ObjectId(facilityId)};
       const result = await facilitiesCollection.findOne(query);
       res.send(result);
+    })
+
+  
+
+    app.post('/my-bookings' , async (req , res) => {
+      const bookingData = req.body;
+      const result = await bookingCollection.insertOne(bookingData);
+      res.json(result);
     })
 
     console.log("Successfully connected to MongoDB!");
