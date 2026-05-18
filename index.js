@@ -13,7 +13,7 @@ app.use(express.json());
 const port = process.env.PORT || 8080;
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = process.env.MONGODB_URI;
 
 
@@ -40,6 +40,13 @@ async function run() {
     app.get('/features' , async (req , res) => {
         const result = await facilitiesCollection.find().limit(6).toArray();
         res.send(result);
+    });
+
+    app.get('/all-facilities/:facilityId' , async (req , res) => {
+      const {facilityId} = req.params;
+      const query = {_id : new ObjectId(facilityId)};
+      const result = await facilitiesCollection.findOne(query);
+      res.send(result);
     })
 
     console.log("Successfully connected to MongoDB!");
