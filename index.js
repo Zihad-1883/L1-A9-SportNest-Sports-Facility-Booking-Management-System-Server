@@ -105,6 +105,16 @@ async function run() {
       res.json(facilityResult , bookingResult);
     })
 
+    app.patch('/all-facilities/:facilityId' , async (req , res) => {
+      const {facilityId} = req.params;
+      const editedData = req.body;
+      const result = await facilitiesCollection.updateOne(
+        {_id : new ObjectId(facilityId)},
+        {$set : editedData}
+      )
+      res.json(result)
+    })
+
     console.log("Successfully connected to MongoDB!");
   } catch (err) {
     console.error("Connection failed:", err.message); 
