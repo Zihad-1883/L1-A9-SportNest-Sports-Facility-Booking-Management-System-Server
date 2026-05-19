@@ -68,6 +68,12 @@ async function run() {
       res.json(result);
     })
 
+    app.post('/added-facilities' , async (req , res) => {
+      const addedFacilityData = req.body;
+      const result = await facilitiesCollection.insertOne(addedFacilityData);
+      res.json(result);
+    })
+
     console.log("Successfully connected to MongoDB!");
   } catch (err) {
     console.error("Connection failed:", err.message); 
