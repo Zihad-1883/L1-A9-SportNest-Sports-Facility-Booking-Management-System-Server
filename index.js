@@ -68,10 +68,15 @@ async function run() {
       res.json(result);
     })
 
-    app.post('/added-facilities' , async (req , res) => {
+    app.post('/all-facilities' , async (req , res) => {
       const addedFacilityData = req.body;
       const result = await facilitiesCollection.insertOne(addedFacilityData);
       res.json(result);
+    })
+
+    app.get('/added-facilities' , async (req , res) => {
+       const result = await facilitiesCollection.find({ owner_email: { $ne: "owner@sportnest.com" }}).toArray();
+      res.send(result);
     })
 
     console.log("Successfully connected to MongoDB!");
