@@ -62,6 +62,12 @@ async function run() {
       res.json(result);
     })
 
+    app.delete('/my-bookings/:bookingID' , async (req , res) => {
+      const {bookingID} = req.params;
+      const result = await bookingCollection.deleteOne({_id : new ObjectId(bookingID)});
+      res.json(result);
+    })
+
     console.log("Successfully connected to MongoDB!");
   } catch (err) {
     console.error("Connection failed:", err.message); 
