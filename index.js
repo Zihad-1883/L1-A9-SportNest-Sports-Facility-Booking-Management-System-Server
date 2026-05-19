@@ -14,6 +14,7 @@ const port = process.env.PORT || 8080;
 
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const { error } = require("node:console");
 const uri = process.env.MONGODB_URI;
 
 
@@ -58,6 +59,18 @@ async function run() {
 
     app.post('/my-bookings' , async (req , res) => {
       const bookingData = req.body;
+      const similarBooking = await bookingCollection.findOne({
+          bookedFacilityID: bookingData.bookedFacilityID,
+          bookedTimeSlot: bookingData.bookedTimeSlot,
+          bookedDate: bookingData.bookedDate,
+          bookedFacilityName : bookingData.bookedFacilityName,
+        });
+        if (similarBooking) {
+          return res.status(409).json({ 
+            success: false, 
+            error: "This time slot is already booked for this facility. Please choose another time slot or choose another facility." 
+          });
+        }
       const result = await bookingCollection.insertOne(bookingData);
       res.json(result);
     })
