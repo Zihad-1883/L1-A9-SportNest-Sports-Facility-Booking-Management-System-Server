@@ -79,6 +79,19 @@ async function run() {
       res.send(result);
     })
 
+    app.get('/added-facilities/:userID' , async (req , res) => {
+      const {userID} = req.params;
+      const result = await facilitiesCollection.find({userID : userID}).toArray();
+      res.json(result);
+    })
+
+    app.delete('/added-facilities/:bookingID' , async (req , res) => {
+      const {bookingID} = req.params;
+      const facilityResult = await facilitiesCollection.deleteOne({_id : new ObjectId(bookingID)});
+      const bookingResult = await bookingCollection.deleteOne({bookedFacilityID : bookingID});
+      res.json(facilityResult , bookingResult);
+    })
+
     console.log("Successfully connected to MongoDB!");
   } catch (err) {
     console.error("Connection failed:", err.message); 
