@@ -15,6 +15,7 @@ const port = process.env.PORT || 8080;
 
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const { error } = require("node:console");
+const { createRemoteJWKSet, jwtVerify } = require("jose-cjs");
 const uri = process.env.MONGODB_URI;
 
 
@@ -25,6 +26,31 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   }
 });
+
+const JWKS = createRemoteJWKSet(
+  new URL('http://localhost:3000/api/auth/jwks')
+)
+
+const handleTokenVerify =  async (req , res , next) => {
+  const header = req?.headers.authorization
+  // console.log(header)
+  if(!header){
+    return res.status(401).json({message : 'Unauthorized'})
+  }
+  const token = header?.split(' ')[1]
+  if(!token){
+    return res.status(401).json({message : 'Unauthorized'})
+  }
+  // console.log(token)
+  try{
+    const {payload} = await jwtVerify(token , JWKS)
+    console.log(payload)
+    next()
+  }catch(error){
+    return res.status(403).json({message : 'Forbidden'})
+  }
+  
+}
 
 async function run() {
   try {
@@ -44,20 +70,20 @@ async function run() {
         res.send(result);
     });
 
-    app.get('/all-facilities/:facilityId' , async (req , res) => {
+    app.get('/all-facilities/:facilityId' , handleTokenVerify , async (req , res) => {
       const {facilityId} = req.params;
       const query = {_id : new ObjectId(facilityId)};
       const result = await facilitiesCollection.findOne(query);
       res.send(result);
     })
 
-    app.get('/my-bookings/:userID' , async (req , res) => {
+    app.get('/my-bookings/:userID' , handleTokenVerify ,  async (req , res) => {
       const {userID} = req.params;
       const result = await bookingCollection.find({userID : userID}).toArray();
       res.json(result);
     })
 
-    app.post('/my-bookings' , async (req , res) => {
+    app.post('/my-bookings' , handleTokenVerify , async (req , res) => {
       const bookingData = req.body;
       const similarBooking = await bookingCollection.findOne({
           bookedFacilityID: bookingData.bookedFacilityID,
@@ -75,37 +101,37 @@ async function run() {
       res.json(result);
     })
 
-    app.delete('/my-bookings/:bookingID' , async (req , res) => {
+    app.delete('/my-bookings/:bookingID' , handleTokenVerify , async (req , res) => {
       const {bookingID} = req.params;
       const result = await bookingCollection.deleteOne({_id : new ObjectId(bookingID)});
       res.json(result);
     })
 
-    app.post('/all-facilities' , async (req , res) => {
+    app.post('/all-facilities' , handleTokenVerify , async (req , res) => {
       const addedFacilityData = req.body;
       const result = await facilitiesCollection.insertOne(addedFacilityData);
       res.json(result);
     })
 
-    app.get('/added-facilities' , async (req , res) => {
+    app.get('/added-facilities' , handleTokenVerify , async (req , res) => {
        const result = await facilitiesCollection.find({ owner_email: { $ne: "owner@sportnest.com" }}).toArray();
       res.send(result);
     })
 
-    app.get('/added-facilities/:userID' , async (req , res) => {
+    app.get('/added-facilities/:userID' , handleTokenVerify , async (req , res) => {
       const {userID} = req.params;
       const result = await facilitiesCollection.find({userID : userID}).toArray();
       res.json(result);
     })
 
-    app.delete('/added-facilities/:bookingID' , async (req , res) => {
+    app.delete('/added-facilities/:bookingID' , handleTokenVerify , async (req , res) => {
       const {bookingID} = req.params;
       const facilityResult = await facilitiesCollection.deleteOne({_id : new ObjectId(bookingID)});
       const bookingResult = await bookingCollection.deleteOne({bookedFacilityID : bookingID});
       res.json(facilityResult , bookingResult);
     })
 
-    app.patch('/all-facilities/:facilityId' , async (req , res) => {
+    app.patch('/all-facilities/:facilityId' , handleTokenVerify , async (req , res) => {
       const {facilityId} = req.params;
       const editedData = req.body;
       const result = await facilitiesCollection.updateOne(
