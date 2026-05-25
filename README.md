@@ -1,5 +1,10 @@
 # SportNest - Sports Facility Booking Management System (Server)
 
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)
+![Express](https://img.shields.io/badge/Express-black?style=for-the-badge&logo=express)
+![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
+![Vercel](https://img.shields.io/badge/Vercel-black?style=for-the-badge&logo=vercel)
+
 ## Purpose
 This is the backend REST API for SportNest, a sports facility booking platform. It handles all CRUD operations for facilities and bookings, JWT-based authentication verification, and MongoDB database management.
 
